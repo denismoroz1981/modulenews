@@ -22,8 +22,11 @@
     <h1>Slider here</h1>
     </div>
     <div class="col-md-2">
-        <h1>Authorization</h1>
+        <h3>Authorization</h3>
         <?= $userInfo; ?>
+        <br>
+        <? if (!empty($_SESSION['username'])) {if ($_SESSION['username']=='admin') {
+            echo '<p><a href="/index.php?admin=admin">go to admin panel</a></p>';}} ?>
     </div>
 </div>
 <div class="row">
