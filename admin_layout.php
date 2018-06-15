@@ -52,6 +52,9 @@
                     <a class="nav-link disabled" href="/index.php/?view=comments">Comments</a>
                 </li>
                 <li class="nav-item">
+                    <a class="nav-link disabled" href="/index.php/?view=approval">Comments to approve</a>
+                </li>
+                <li class="nav-item">
                     <a class="nav-link disabled" href="/index.php/?view=ads">Ads</a>
                 </li>
 				<li class="nav-item dropdown ml-md-auto">
@@ -76,6 +79,9 @@
                 }
                 if ($_GET["view"]=="comments") {
                     require_once("admin/comments.php");
+                }
+                if ($_GET["view"]=="approval") {
+                    require_once("admin/approval.php");
                 }
                 if ($_GET["view"]=="ads") {
                     require_once("admin/ads.php");
