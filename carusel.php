@@ -18,6 +18,7 @@
 
     <div class="container-fluid">
 	<div class="row">
+
 		<div class="col-md-12">
 			<div class="carousel slide" id="carousel-179092">
 				<ol class="carousel-indicators">

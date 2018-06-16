@@ -36,10 +36,14 @@ try {
 
 
 
-if(!empty($_SESSION["username"])) {
+if(!empty($_SESSION["username"]))
+{if($_SESSION["username"]=="admin")
+{
 
     include_once("admin_layout.php");
 
 } else {
+    include_once ("layout.php");
+}} else {
     include_once ("layout.php");
 }

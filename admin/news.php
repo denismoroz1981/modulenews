@@ -38,8 +38,9 @@ echo '<p><b>News</b></p>';
 
         echo '<p><form action="" method="get">
             <b>'.$row["id"].'. </b><i>'.$row["created_at"].'</i>
-            <b>'.$row["name"].'</b> '.
-            $row["text_head"].' 
+            <b>'.$row["name"].'</b> '.$row["category_id"].
+            ' <p>'.
+            $row["text_head"].'</p>
     <br>
     <input name="id" value='.$row["id"].' type="hidden">
     <!--<input name="cat_start" value="1" type="hidden">-->

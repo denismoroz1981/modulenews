@@ -32,7 +32,8 @@ $layout.='<input type="submit" value="Upload files"></form>';
 echo $layout;
 
 
-$uploadDIR = __DIR__ ."/../img/". DIRECTORY_SEPARATOR . $_GET["id"];
+$uploadDIR = __DIR__ ."/../img". DIRECTORY_SEPARATOR . $_GET["id"];
+
 echo '<br>'.$uploadDIR;
 
         if (!empty($_FILES)) {
@@ -54,11 +55,12 @@ echo '<br>'.$uploadDIR;
                         throw new Exception($isProhibited);
                     }
 
-                    //if (!file_exists($uploadDIR)) {
-                      //  mkdir($uploadDIR, 0777, true);
-                    //}
                     if (!file_exists($uploadDIR)) {
-                        move_uploaded_file($tmp_name, $uploadDIR);
+                        mkdir($uploadDIR, 0777, true);
+                    }
+                    $fileToSave = $uploadDIR.DIRECTORY_SEPARATOR.$name;
+                    if (!file_exists($fileToSave)) {
+                        move_uploaded_file($tmp_name, $fileToSave);
                     } else {
                         throw new Exception("<i>File {$_FILES["userfile"]["name"]}
                             has not been uploaded twice.</i><br>");

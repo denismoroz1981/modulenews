@@ -1,9 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+< lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
     !-- Latest compiled and minified CSS -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
 
     <!-- Optional theme -->
@@ -11,17 +12,22 @@
 
     <!-- Latest compiled and minified JavaScript -->
     <script src="//netdna.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
+   <!--<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>-->
 
+    <script src="https://npmcdn.com/tether@1.2.4/dist/js/tether.min.js"></script>
 </head>
 <body>
-<? require_once ('user_auth.php'); ?>
+<? require_once ('user_auth.php');
+
+
+
+?>
 
 <div class="container-fluid">
 <div class="row">
     <div class="col-md-10">
     <h1>Slider here</h1>
-
-
+    <? require_once ("carusel.php") ?>
 
 
 
@@ -39,6 +45,22 @@
     <h3>Adds:</h3>
     </div>
     <div class="col-md-8">
+        <?php
+        if(!empty($_GET["tag"])) {
+            require_once ("views/tags.php");
+        } elseif (empty($_GET["cat"])) {
+            require_once("views/news_start.php");
+        } else {
+            require_once ("views/category_front.php");
+        }
+
+
+
+
+
+
+        ?>
+
     </div>
     <div class="col-md-2">
         <h3>Adds:</h3>
@@ -49,4 +71,7 @@
 
 
 </body>
+<footer>
+    Copyright
+</footer>
 </html>
