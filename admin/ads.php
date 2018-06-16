@@ -6,123 +6,166 @@
  * Time: 18:38
  */
 
-echo '<p><b>Comments</b></p>';
+echo '<p><b>Ads</b></p>';
 
-$commentsSelect = $dbn->prepare('SELECT id,news_id,`user`,text, created_at, 
-      isapproved,plus FROM `comments` LIMIT :start,:nrow');
-$commentsCount = $dbn->query('SELECT COUNT(*) FROM `comments`');
-$commentsInsert= $dbn->prepare('INSERT INTO comments SET 
-      `news_id`=:news_id,
-      parent_id=:parent_id,
-      `user`=:username,
-      text=:text, 
-       isapproved=:isapproved        
+$adsSelect = $dbn->prepare('SELECT id,sort,item,price, vendor, 
+      isvisible FROM `ads` LIMIT :start,:nrow');
+$adsCount = $dbn->query('SELECT COUNT(*) FROM `ads`');
+$adsInsert= $dbn->prepare('INSERT INTO ads SET 
+      `sort`=:sort,
+      item=:item,
+      price=:price,
+      vendor=:vendor, 
+       isvisible=:isvisible        
         ');
-$commentsUpdate= $dbn->prepare('UPDATE comments SET 
-      text=:text, 
-       isapproved=:isapproved
+$adsUpdate= $dbn->prepare('UPDATE ads SET 
+      `sort`=:sort,
+      item=:item,
+      price=:price,
+      vendor=:vendor, 
+       isvisible=:isvisible
          WHERE id=:id
         ');
 
 
-$commentsDelete= $dbn->prepare('DELETE FROM `comments` WHERE `id`=?');
+$adsDelete= $dbn->prepare('DELETE FROM `ads` WHERE `id`=?');
 $nrow = 5;
 if (!empty($_GET["cat_start"])) {
-    $start = $_GET["cat_start"]*$nrow+1; } else {
+    $start = intval($_GET["cat_start"])*$nrow+1; } else {
     $start = 0;
 }
-$commentsSelect->bindParam(':start',$start,PDO::PARAM_INT);
-$commentsSelect->bindParam(':nrow',$nrow,PDO::PARAM_INT);
+$adsSelect->bindParam(':start',$start,PDO::PARAM_INT);
+$adsSelect->bindParam(':nrow',$nrow,PDO::PARAM_INT);
+$adsCount = $adsCount->fetch();
+$adsCount = intval($adsCount["COUNT(*)"]);
 
+$adsSelect->execute();
+$adsRows = $adsSelect->fetchAll();
 
-$commentsSelect->execute();
-$commentsRows = $commentsSelect->fetchAll();
-
-foreach ($commentsRows as $row) {
+foreach ($adsRows as $row) {
 
     echo '<p><form action="" method="get">
-            <b>'.$row["id"].'. </b>for news#: '.$row["news_id"].
-        'from user: <i>'.$row["user"].'</i>
-            <b>'.
-        '<i>'.$row["created_at"].'</i><br>
-            <b><input name="text'.$row["id"].'" id="text'.$row["id"].'"></b>
-            <script type="text/javascript"> document.getElementById("text'.$row["id"].'").
-            value ="'.$row["text"].'";</script>
-            
-    <br>
-    <input name="id" value='.$row["id"].' type="hidden">
-    <!--<input name="cat_start" value="1" type="hidden">-->
-    <input name="view" value="comments" type="hidden">
-    <input name="save" value="Save" type="submit"  class="btn-success">
-    <input name="delete" value="Delete" type="submit"  class="btn-danger">
-    </p></form>';
+        
+        <label for="update_ads_id">Ads id:'.$row["id"].'</label> 
+        
+        <label for="update_ads_sort">Sort:</label> <input type="text" 
+        id="update_ads_sort'.$row["id"].'"
+         name="update_ads_sort'.$row["id"].'"><br>
+        <script type="text/javascript"> document.getElementById("update_ads_sort'.$row["id"].'").
+        value ='.$row["sort"].';</script>
 
-}
-$commentsCount = $commentsCount->fetch();
-$commentsCount = intval($commentsCount["COUNT(*)"]);
-echo "<p>News count:".print_r($commentsCount,1)."</p>";
-$j=0;
-for ($i=0; $i<=round($commentsCount/$nrow)-1; $i++) {
-    $j=++$j;
-    echo '<a href="index.php/?view=comments&cat_start='.$i.'">'.$j.'</a> ';
-}
+        <label for="update_ads_item">Item:</label>
+        <textarea id="update_ads_item'.$row["id"].'" name="update_ads_item'.$row["id"].'"></textarea><br>
+         <script type="text/javascript"> document.getElementById("update_ads_item'.$row["id"].'").
+        value = "'.$row["item"].'";</script>
+
+        <label for="update_ads_price">Price:</label> <input type="text"
+        id="update_ads_price'.$row["id"].'"
+         name="update_ads_price'.$row["id"].'"><br>
+        <script type="text/javascript"> document.getElementById("update_ads_price'.$row["id"].'").
+        value = '.$row["price"].';</script>
+
+        <label for="update_ads_vendor">Vendor:</label> <input type="text"
+        id="update_ads_vendor'.$row["id"].'"
+         name="update_ads_vendor'.$row["id"].'"><br>
+        <script type="text/javascript"> document.getElementById("update_ads_vendor'.$row["id"].'").
+        value ="'.$row["vendor"].'";</script>
+
+        <label for="update_ads_visible'.$row["id"].'">Is visible?</label>
+            <input type = "checkbox" value="1" name="update_ads_visible'.$row["id"].'" id="update_ads_visible'.$row["id"].'"></b>
+            <script type="text/javascript"> document.getElementById("update_ads_visible'.$row["id"].'").checked
+        ="'.(boolean)$row["isvisible"].'";</script>
 
 
-
-
-
-
-?>
-    <form action="" method="get">
-        <br>
-        <p><b>New comment:</b></p>
-        <label for="new_comments_news_id">News id:</label> <input type="text" id="new_comments_news_id" name="new_comments_news_id"><br>
-        <label for="new_comments_parent_id">Parent comment id:</label> <input type="text" id="new_comments_parent_id" name="new_comments_parent_id"><br>
-        <script type="text/javascript"> document.getElementById('new_comments_parent_id').value = '0';</script>
-        <label for="new_comments_text">Text:</label>
-        <textarea id="new_comments_text" name="new_comments_text"></textarea><br>
-        <label for="new_comments_isapproved">Approved:</label>
-        <input type="checkbox" id="new_comments_isapproved" name="new_comments_isapproved" value="1"><br>
-        <label for="new_comments_user">User:</label>
-        <input type="text" id="new_comments_user" name="new_comments_user">
-
-        <input name="new_comments" value='yes' type="hidden">
-        <input name="view" value="comments" type="hidden">
-        <input name="cat_start" value="<?=round(($commentsCount)/$nrow-1)?>" type="hidden"><br>
+        <input name="update" value="yes" type="hidden">
+        <input name="view" value="ads" type="hidden">
+        <input name="id" value="'.$row["id"].'" type="hidden">
         <input type="submit">
-    </form>
+        <input name="cat_start" value="'.round(($adsCount)/$nrow-1).'" type="hidden"><br>
+        </form>';
 
-<? if (!empty($_GET)) {if (isset($_GET["delete"])) {
+}
 
-    $commentsDelete->execute(array($_GET["id"]));
+echo "<p>News count:".print_r($adsCount,1)."</p>";
+$j=0;
+for ($i=0; $i<=round($adsCount/$nrow)-1; $i++) {
+    $j=++$j;
+    echo '<a href="index.php/?view=ads&cat_start='.$i.'">'.$j.'</a> ';
+}
+
+    echo '<p><form action="" method="get">
+     <p><b>New ads:</b></p>
+    <label for="new_ads_sort">Sort:</label> <input type="text" id="new_ads_sort"
+    name="new_ads_sort"><br>
+    
+    <label for="new_ads_item">Item:</label>
+    <textarea id="new_ads_item" name="new_ads_item"></textarea><br>
+    
+    <label for="new_ads_price">Price:</label> <input type="text" id="new_ads_price"
+     name="new_ads_price"><br>
+    
+    <label for="new_ads_vendor">Vendor:</label> <input type="text" id="new_ads_vendor"
+    name="new_ads_vendor"><br>
+    
+    <label for="new_ads_visible">Is visible?</label>
+    <input type = "checkbox" value="1" name="new_ads_visible" id="new_ads_visible"></b>
+    
+
+    <input name="save" value="yes" type="hidden">
+    <input name="view" value="ads" type="hidden">
+    
+    <input type="submit"></form>';
+
+
+ if (!empty($_GET)) {if (isset($_GET["delete"])) {
+
+    $adsDelete->execute(array($_GET["id"]));
 }}
+
+if (!empty($_GET)) {if (isset($_GET["update"])) {
+    $sortToSave='update_ads_sort'.$_GET["id"];
+    $itemToSave='update_ads_item'.$_GET["id"];
+    $vendorToSave='update_ads_vendor'.$_GET["id"];
+    $priceToSave='update_ads_price'.$_GET["id"];
+    $visibleToSave='update_ads_visible'.$_GET["id"];
+    if (empty($_GET[$visibleToSave])) {
+        $_GET[$visibleToSave]=0;
+    }
+
+    $adsUpdate->bindParam(':id',$_GET["id"],PDO::PARAM_INT);
+    $adsUpdate->bindParam(':sort',$_GET[$sortToSave],PDO::PARAM_INT);
+    $adsUpdate->bindParam(':item',$_GET[$itemToSave],PDO::PARAM_STR);
+    $adsUpdate->bindParam(':vendor',$_GET[$vendorToSave],PDO::PARAM_STR);
+    $adsUpdate->bindParam(':price',$_GET[$priceToSave],PDO::PARAM_INT);
+
+    $adsUpdate->bindParam(':isvisible',$_GET[$visibleToSave],PDO::PARAM_INT);
+
+    $adsUpdate->execute();
+}}
+
+
 
 if (!empty($_GET)) {if (isset($_GET["save"])) {
-    $textToSave='text'.$_GET["id"];
-    $isapproved=1;
-    $commentsUpdate->bindParam(':id',$_GET["id"],PDO::PARAM_INT);
-    $commentsUpdate->bindParam(':text',$_GET[$textToSave],PDO::PARAM_STR);
-    $commentsUpdate->bindParam(':isapproved',$isapproved,PDO::PARAM_INT);
+    $sortToSave='new_ads_sort';
+    $itemToSave='new_ads_item';
+    $vendorToSave='new_ads_vendor';
+    $priceToSave='new_ads_price';
+    $visibleToSave='new_ads_visible';
+    if (empty($_GET[$visibleToSave])) {
+        $_GET[$visibleToSave]=0;
+    }
 
-    $commentsUpdate->execute();
+
+    $adsInsert->bindParam(':sort',$_GET[$sortToSave],PDO::PARAM_INT);
+    $adsInsert->bindParam(':item',$_GET[$itemToSave],PDO::PARAM_STR);
+    $adsInsert->bindParam(':vendor',$_GET[$vendorToSave],PDO::PARAM_STR);
+    $adsInsert->bindParam(':price',$_GET[$priceToSave],PDO::PARAM_INT);
+
+    $adsInsert->bindParam(':isvisible',$_GET[$visibleToSave],PDO::PARAM_INT);
+
+    $adsInsert->execute();
 }}
 
-
-
-if (!empty($_GET["new_comments"])) {
-
-    if(empty($_GET["new_comments_isapproved"])) {$_GET["new_comments_isapproved"]=0;}
-    $commentsInsert->bindParam(':news_id',$_GET["new_comments_news_id"],PDO::PARAM_INT);
-    $commentsInsert->bindParam(':parent_id',$_GET["new_comments_parent_id"],PDO::PARAM_STR);
-    $commentsInsert->bindParam(':text',$_GET["new_comments_text"],PDO::PARAM_STR);
-    $commentsInsert->bindParam(':username',$_GET["new_comments_user"],PDO::PARAM_STR);
-    $commentsInsert->bindParam(':isapproved',$_GET["new_comments_isapproved"],PDO::PARAM_INT);
-    //$commentsInsert->bindParam(':category_id',$_GET["new_news_category_id"],PDO::PARAM_STR);
-
-
-    $commentsInsert->execute();
-
-}
 
 
 

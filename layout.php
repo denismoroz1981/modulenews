@@ -20,6 +20,11 @@
 <div class="row">
     <div class="col-md-10">
     <h1>Slider here</h1>
+
+
+
+
+
     </div>
     <div class="col-md-2">
         <h3>Authorization</h3>

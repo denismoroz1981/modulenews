@@ -41,10 +41,12 @@ foreach ($commentsRows as $row) {
         ' from user: <i>'.$row["user"].'</i>
             <b>'.
         '<i>'.$row["created_at"].'</i><br><div class="well">'.$row["text"].'</div>
-            <label for="isapproved'.$row["text"].'">Is approved?</label>
-            <input type = "checkbox" name="isapproved'.$row["text"].'" id="isapproved'.$row["id"].'"></b>
+            <label for="isapproved'.$row["id"].'">Is approved?</label>
+            <input type = "checkbox" value="1" name="isapproved'.$row["id"].'" id="isapproved'.$row["id"].'"></b>
             <script type="text/javascript"> document.getElementById("isapproved'.$row["id"].'").checked
-             ="'.(boolean)$row["isapproved"].'";</script>
+             ="'.(boolean)$row["isapproved"].'";
+             
+             </script>
             
     <br>
     <input name="id" value='.$row["id"].' type="hidden">
@@ -55,6 +57,7 @@ foreach ($commentsRows as $row) {
     </p></form>';
 
 }
+
 $commentsCount = $commentsCount->fetch();
 $commentsCount = intval($commentsCount["COUNT(*)"]);
 echo "<p>News count:".print_r($commentsCount,1)."</p>";
@@ -66,12 +69,17 @@ for ($i=0; $i<=round($commentsCount/$nrow)-1; $i++) {
 
 if (!empty($_GET)) {if (isset($_GET["save"])) {
     $approvalToSave='isapproved'.$_GET["id"];
+    if (empty($_GET[$approvalToSave])) {
+        $_GET[$approvalToSave]=0;
+    }
 
     $commentsUpdate->bindParam(':id',$_GET["id"],PDO::PARAM_INT);
-    $commentsUpdate->bindParam(':isapproved',$approvalToSave,PDO::PARAM_BOOL);
+    $commentsUpdate->bindParam(':isapproved',$_GET[$approvalToSave],PDO::PARAM_BOOL);
 
     $commentsUpdate->execute();
 }}
+
+echo var_export($_GET,1);
 
 
 

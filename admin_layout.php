@@ -40,7 +40,7 @@
 		<div class="col-md-2">
 			<ul class="nav">
 				<li class="nav-item">
-					<a class="nav-link active" href="/"><-Back to frontend</a>
+					<a class="nav-link active" href="/logout.php"><-Back to frontend</a>
 				</li>
 				<li class="nav-item">
 					<a class="nav-link" href="/index.php/?view=categories">Categories</a>
