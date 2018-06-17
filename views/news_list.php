@@ -15,7 +15,7 @@ $nrow = 5;
 
 if (!empty($_GET["cat_start"])) {
     $cat_start=$_GET["cat_start"];
-    $start = $cat_start * $nrow + 1;
+    $start = $cat_start * $nrow;
 } else {
     $cat_start=0;
     $start = 0;

@@ -21,13 +21,27 @@
 
 
 
+
 ?>
 
 <div class="container-fluid">
+    <div class="row">
+    <div class="col-md-4">
+        <? require_once ("views/tags_search.php") ?>
+    </div>
+    <div class="col-md-8">
+    </div>
+    </div>
+
+
+</div>
 <div class="row">
     <div class="col-md-10">
-    <h1>Slider here</h1>
-    <? require_once ("carusel.php") ?>
+
+    <?
+    require_once ('views/news_slider.php');
+    require_once ("carusel.php") ?>
+
 
 
 
