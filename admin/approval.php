@@ -8,13 +8,13 @@
 
 echo '<br><p><b>Polical news to be approved:</b></p>';
 
-$commentsSelect = $dbn->prepare('
+$commentsById = $dbn->prepare('
 SELECT c.id,c.news_id,c.user,c.text, c.created_at, c.isapproved, n.category_id
 FROM `comments` as `c` LEFT JOIN `news` as `n` ON c.news_id = n.id 
-HAVING n.category_id = "politics"
+HAVING n.category_id = "politics"AND c.isapproved=0
 LIMIT :start,:nrow');
 $commentsCount = $dbn->query('SELECT COUNT(*) FROM `comments` 
-LEFT JOIN news as `n` ON comments.news_id=n.id where n.category_id="politics"');
+LEFT JOIN news as `n` ON comments.news_id=n.id where n.category_id="politics" AND isapproved=0');
 
 $commentsUpdate= $dbn->prepare('UPDATE comments SET 
       
@@ -27,12 +27,12 @@ if (!empty($_GET["cat_start"])) {
     $start = $_GET["cat_start"]*$nrow+1; } else {
     $start = 0;
 }
-$commentsSelect->bindParam(':start',$start,PDO::PARAM_INT);
-$commentsSelect->bindParam(':nrow',$nrow,PDO::PARAM_INT);
+$commentsById->bindParam(':start',$start,PDO::PARAM_INT);
+$commentsById->bindParam(':nrow',$nrow,PDO::PARAM_INT);
 
 
-$commentsSelect->execute();
-$commentsRows = $commentsSelect->fetchAll();
+$commentsById->execute();
+$commentsRows = $commentsById->fetchAll();
 
 foreach ($commentsRows as $row) {
 
@@ -79,7 +79,7 @@ if (!empty($_GET)) {if (isset($_GET["save"])) {
     $commentsUpdate->execute();
 }}
 
-echo var_export($_GET,1);
+//echo var_export($_GET,1);
 
 
 

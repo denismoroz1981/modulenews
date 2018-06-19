@@ -60,7 +60,7 @@ foreach ($commentsRows as $row) {
 }
 $commentsCount = $commentsCount->fetch();
 $commentsCount = intval($commentsCount["COUNT(*)"]);
-echo "<p>News count:".print_r($commentsCount,1)."</p>";
+echo "<p>Comments count:".print_r($commentsCount,1)."</p>";
 $j=0;
 for ($i=0; $i<=round($commentsCount/$nrow)-1; $i++) {
     $j=++$j;

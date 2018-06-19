@@ -33,8 +33,7 @@ try {
 
 
 
-
-
+if (!empty($_GET["plus"])) {require_once("views/rating_change.php");}
 
 if(!empty($_SESSION["username"]))
 {if($_SESSION["username"]=="admin")

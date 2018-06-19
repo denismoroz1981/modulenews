@@ -18,12 +18,16 @@ $catArr=array_unique($catArr);
 
 function countNews($cat) {
     global $dbn;
-    $newsCount = $dbn->prepare('SELECT COUNT(*) FROM `news` WHERE category_id = :cat');
+    if ($cat=="analytics") {
+        $newsCount = $dbn->query('SELECT COUNT(*) FROM `news` WHERE isanalytical = 1');
+    } else {
+        $newsCount = $dbn->prepare('SELECT COUNT(*) FROM `news` WHERE category_id = :cat');
+
+        $newsCount->bindParam(':cat', $cat, PDO::PARAM_STR);
+        $newsCount->execute();
+    }
 
 
-    $newsCount->bindParam(':cat', $cat, PDO::PARAM_STR);
-
-    $newsCount->execute();
     $newsCount = $newsCount->fetch();
     $count = intval($newsCount["COUNT(*)"]);
 
@@ -34,15 +38,28 @@ function countNews($cat) {
 function selectNews ($cat,$start=0,$nrow=5)
 {
     global $dbn;
+    if ($cat=="analytics") {
+        $newsSelect = $dbn->prepare('SELECT id,`name`,text_head,text_main, created_at, 
+          photo, isanalytical, category_id FROM `news` WHERE isanalytical = 1 ORDER BY created_at DESC 
+           LIMIT :start,:nrow');
+    } else  {
     $newsSelect = $dbn->prepare('SELECT id,`name`,text_head,text_main, created_at, 
           photo, isanalytical, category_id FROM `news` WHERE category_id = :cat ORDER BY created_at DESC 
            LIMIT :start,:nrow');
+    $newsSelect->bindParam(':cat', $cat, PDO::PARAM_STR); }
+
 
     $newsSelect->bindParam(':start', $start, PDO::PARAM_INT);
     $newsSelect->bindParam(':nrow', $nrow, PDO::PARAM_INT);
-    $newsSelect->bindParam(':cat', $cat, PDO::PARAM_STR);
+
 
     $newsSelect->execute();
     $newsRows = $newsSelect->fetchAll();
     return $newsRows;
 }
+
+$topCommentators = $dbn->query('SELECT `user`, COUNT(*) AS ncomm FROM comments GROUP BY `user` 
+ORDER BY ncomm DESC');
+$topCommentators = $topCommentators->fetchAll();
+
+

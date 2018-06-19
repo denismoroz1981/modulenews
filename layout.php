@@ -62,10 +62,13 @@
         <?php
         if(!empty($_GET["tag"])) {
             require_once ("views/tags.php");
-        } elseif (empty($_GET["cat"])) {
-            require_once("views/news_start.php");
-        } else {
+        } elseif (!empty($_GET["cat"])) {
             require_once ("views/category_front.php");
+        } elseif (!empty($_GET["user"])) {
+            require_once("views/user_comments.php");
+        } else {
+        ;
+            require_once("views/news_start.php");
         }
 
 
