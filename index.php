@@ -1,3 +1,8 @@
+<body onunload="bye()">
+
+
+
+
 <?php
 /**
  * Created by PhpStorm.
@@ -46,3 +51,17 @@ if(!empty($_SESSION["username"]))
 }} else {
     include_once ("layout.php");
 }
+
+?>
+
+</body>
+
+<script>
+    //function bye() { confirm('Do you wish to leave the site?') ;
+    //return false;
+    //}
+    //window.onunload=bye();
+    $(window).bind('beforeunload', function () {
+        return "Are you sure you want to exit?";
+    });
+</script>

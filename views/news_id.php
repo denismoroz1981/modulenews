@@ -16,7 +16,7 @@ $newsById = $dbn->prepare('SELECT id,`name`,text_head,text_main, created_at,
 $commentsByUser = $dbn->prepare('SELECT id,news_id,`user`,text, created_at, 
       isapproved,plus FROM `comments` WHERE news_id=:id LIMIT :start,:nrow');
 $commentsCount = $dbn->prepare('SELECT COUNT(*) FROM `comments` WHERE news_id = :id');
-$commentsInsert= $dbn->prepare('INSERT INTO comments SET 
+$menuInsert= $dbn->prepare('INSERT INTO comments SET 
       `news_id`=:news_id,
       parent_id=:parent_id,
       `user`=:username,
@@ -114,7 +114,7 @@ if (!empty($_SESSION["username"])) {
     echo '<p>New comment:</p>';
     echo '<input type="hidden" name="news_id" value="'.$_GET["news_id"].'">';
     echo '<input type="hidden" name="cat" value="'.$_GET["cat"].'">';
-    echo '<input type="hidden" name="parent_id" value="0">';
+    echo '<input type="hidden" name="parent_id" value="0">'; // parent_id
     echo '<input type="text" name="new_comments_text" id="new_comments_text">';
 
     echo '<input type="submit" value="Save">';
@@ -127,15 +127,15 @@ echo '</form>';
 if (!empty($_GET["new_comments_text"])) {
 
     if(empty($_GET["new_comments_isapproved"])) {$_GET["new_comments_isapproved"]=0;}
-    $commentsInsert->bindParam(':news_id',$_GET["news_id"],PDO::PARAM_INT);
-    $commentsInsert->bindParam(':parent_id',$_GET["new_comments_parent_id"],PDO::PARAM_STR);
-    $commentsInsert->bindParam(':text',$_GET["new_comments_text"],PDO::PARAM_STR);
-    $commentsInsert->bindParam(':username',$_SESSION["username"],PDO::PARAM_STR);
-    $commentsInsert->bindParam(':isapproved',$_GET["new_comments_isapproved"],PDO::PARAM_INT);
+    $menuInsert->bindParam(':news_id',$_GET["news_id"],PDO::PARAM_INT);
+    $menuInsert->bindParam(':parent_id',$_GET["new_comments_parent_id"],PDO::PARAM_INT);
+    $menuInsert->bindParam(':text',$_GET["new_comments_text"],PDO::PARAM_STR);
+    $menuInsert->bindParam(':username',$_SESSION["username"],PDO::PARAM_STR);
+    $menuInsert->bindParam(':isapproved',$_GET["new_comments_isapproved"],PDO::PARAM_INT);
     //$commentsInsert->bindParam(':category_id',$_GET["new_news_category_id"],PDO::PARAM_STR);
 
 
-    $commentsInsert->execute();
+    $menuInsert->execute();
 
 }
 
@@ -151,7 +151,112 @@ $k = array_search($bestRated,$commentsRows);
 unset($commentsRows[$k]);
 array_unshift($commentsRows,$bestRated);
 
+function displaySubComment($subrow) {
+
+    echo '<div style="margin-left: 30px"><form action="" method="get">
+        Comment #<span id="comment_id">'.$subrow["id"].
+        '</span> from user: <i>'.$subrow["user"].'</i>
+            '.
+        'posted: <b><i>'.$subrow["created_at"].'</i><br>
+            <b><input name="text'.$subrow["id"].'"readonly id="text'.$subrow["id"].'"></b>
+            <script type="text/javascript"> document.getElementById("text'.$subrow["id"].'").
+            value ="'.$subrow["text"].'";</script>
+            
+    <br>
+    <input name="id" value='.$subrow["id"].' type="hidden">
+    <!--<input name="cat_start" value="1" type="hidden">-->
+    <input name="view" value="comments" type="hidden">';
+    $startTime = new DateTime();
+    $tz1=timezone_open('Europe/Kiev');
+    $startTime->setTimezone($tz1);
+    //if (is_null($row["created_at"])) {$row["created_at"]=0;}
+    $startTime ->setTimestamp(date(strtotime($subrow['created_at'])));
+    //$timeDiff = $startTime->diff(new DateTime("now"));
+    //echo var_export($row["created_at"]);
+    $now = new DateTime();
+    $timestamp = time();
+    $now->setTimezone($tz1);
+    $now->setTimestamp($timestamp);
+    $now->modify('+1 hour');
+    $timeDiff= $now->getTimestamp() - strtotime($subrow['created_at']);
+    echo '<p>Posted sec ago:'.$timeDiff.'</p>';
+    //echo '<p>Now:'.date("l dS \o\f F Y h:i:s A",$now->getTimestamp()).'</p>';
+    //echo '<p>Start:'.strtotime($row['created_at']).'</p>';
+    if (!empty($_SESSION["username"])) {
+        if ($_SESSION["username"] == $subrow["user"] && $timeDiff<60) {
+            echo '<script type="text/javascript"> document.getElementById("text'.$subrow["id"].'").
+                removeAttribute("readonly");</script>';
+            echo '<input name="save" value="Save" type="submit"  class="btn-outline-secondary">';}
+    }
+    // echo '<input name="save" value="Save" type="submit"  class="btn-success">';'
+    echo '<input type="hidden" name="news_id" value="'.$_GET["news_id"].'">';
+    echo '<input type="hidden" name="cat" value="'.$_GET["cat"].'">';
+    echo 'rating: <span id="rating'.$subrow["id"].'">'.$subrow["plus"].'</span>';
+    echo '<input type="submit" name="plus" id="plus'.$subrow["id"].'" value="+">';
+    echo '<script type="text/javascript"> 
+          var button =  document.getElementById("plus'.$subrow["id"].'");
+          function operClick(e) {
+                //var rating = document.getElementById("dots");
+           id = '.$subrow["id"].';
+           plus = parseInt($("#rating"+id).text())+1;
+           
+        $.ajax({
+            type: "GET",
+            url:"/",
+            data:{
+                id:id,
+                plus:plus
+            },
+            success: function($data) {
+                rating_id="#rating"+id;
+                $(rating_id).html(plus);
+                
+            }            
+            
+        })
+        
+        
+           e.preventDefault();
+    }
+    button.addEventListener("click",operClick,false);               
+                
+                </script>';
+
+    echo '<input type="submit" name="minus" id="minus'.$subrow["id"].'" value="-">';
+    echo '<script type="text/javascript"> 
+          var button =  document.getElementById("minus'.$subrow["id"].'");
+          function operClick(e) {
+                //var rating = document.getElementById("dots");
+           id = '.$subrow["id"].';
+           plus = parseInt($("#rating"+id).text())-1;
+           
+        $.ajax({
+            type: "GET",
+            url:"/",
+            data:{
+                id:id,
+                plus:plus
+            },
+            success: function($data) {
+                rating_id="#rating"+id;
+                $(rating_id).html(plus);
+                
+            }            
+            
+        })
+        
+        
+           e.preventDefault();
+    }
+    button.addEventListener("click",operClick,false);               
+                
+                </script>';
+
+    echo '</p></form>';
+}
+
 function displayComment($row) {
+
     echo '<p><form action="" method="get">
         Comment #<span id="comment_id">'.$row["id"].
         '</span> from user: <i>'.$row["user"].'</i>
@@ -191,6 +296,7 @@ function displayComment($row) {
     echo '<input type="hidden" name="news_id" value="'.$_GET["news_id"].'">';
     echo '<input type="hidden" name="cat" value="'.$_GET["cat"].'">';
     echo 'rating: <span id="rating'.$row["id"].'">'.$row["plus"].'</span>';
+    //button +
     echo '<input type="submit" name="plus" id="plus'.$row["id"].'" value="+">';
     echo '<script type="text/javascript"> 
           var button =  document.getElementById("plus'.$row["id"].'");
@@ -220,7 +326,7 @@ function displayComment($row) {
     button.addEventListener("click",operClick,false);               
                 
                 </script>';
-
+    //button -
     echo '<input type="submit" name="minus" id="minus'.$row["id"].'" value="-">';
     echo '<script type="text/javascript"> 
           var button =  document.getElementById("minus'.$row["id"].'");
@@ -252,7 +358,44 @@ function displayComment($row) {
                 </script>';
 
     echo '</p></form>';
+//SUBCOMMENTS
+    global $dbn;
+    $subComments = $dbn->prepare('SELECT id,news_id,`user`,text, created_at, 
+      isapproved,plus, parent_id FROM `comments` WHERE news_id=:id AND parent_id=:parent_id');
+    $subComments->bindParam(':id',$_GET["news_id"],PDO::PARAM_INT);
+    $subComments->bindParam(':parent_id',$row["id"],PDO::PARAM_INT);
+    $subComments->execute();
+    $subcommentsRows=$subComments->fetchAll();
+
+    //Subcomment
+    //echo var_export($subcommentsRows);
+    if (!empty($subcommentsRows[0])) {
+        foreach ($subcommentsRows as $subrow) {
+            if ($_GET["cat"]!=="politics") {
+                displaySubComment($subrow,$row["id"]);
+            } elseif ($subrow["isapproved"]) {
+                displaySubComment($subrow,$row["id"]);
+            }}}
+    //new subcomment
+    echo '<div style="margin-left: 30px"><form action="/" method="get">';
+    if (!empty($_SESSION["username"])) {
+        echo '<p>New subcomment:</p>';
+        echo '<input type="hidden" name="news_id" value="'.$_GET["news_id"].'">';
+        echo '<input type="hidden" name="cat" value="'.$_GET["cat"].'">';
+        echo '<input type="hidden" name="new_comments_parent_id" value="'.$row["id"].'">'; // parent_id
+        echo '<input type="text" name="new_comments_text" id="new_comments_text">';
+
+        echo '<input type="submit" value="Save">';
+    } else {
+        echo 'Only authorised users may comment.';
+    }
+    echo '</form></div>';
 }
+
+
+
+
+
 
 
 if ($commentsRows[0]) {
@@ -272,6 +415,7 @@ if (!empty($_GET["save"])) {
     $textToSave='text'.$_GET["id"];
     $isapproved=0;
     $commentsUpdate->bindParam(':id',$_GET["id"],PDO::PARAM_INT);
+
     $commentsUpdate->bindParam(':text',$_GET[$textToSave],PDO::PARAM_STR);
     $commentsUpdate->bindParam(':isapproved',$isapproved,PDO::PARAM_INT);
 

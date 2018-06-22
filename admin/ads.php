@@ -88,7 +88,7 @@ foreach ($adsRows as $row) {
 
 echo "<p>News count:".print_r($adsCount,1)."</p>";
 $j=0;
-for ($i=0; $i<=round($adsCount/$nrow)-1; $i++) {
+for ($i=0; $i<=round($adsCount/$nrow); $i++) {
     $j=++$j;
     echo '<a href="index.php/?view=ads&cat_start='.$i.'">'.$j.'</a> ';
 }

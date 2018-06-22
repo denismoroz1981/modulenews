@@ -57,12 +57,12 @@
                 <li class="nav-item">
                     <a class="nav-link disabled" href="/index.php/?view=ads">Ads</a>
                 </li>
-				<li class="nav-item dropdown ml-md-auto">
-					 <a class="nav-link dropdown-toggle" href="http://example.com" id="navbarDropdownMenuLink" data-toggle="dropdown">Dropdown link</a>
-					<div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownMenuLink">
-						 <a class="dropdown-item" href="#">Action</a> <a class="dropdown-item" href="#">Another action</a> <a class="dropdown-item" href="#">Something else here</a>
-						<div class="dropdown-divider">
-						</div> <a class="dropdown-item" href="#">Separated link</a>
+                <li class="nav-item">
+                    <a class="nav-link disabled" href="/index.php/?view=menu">Menu</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link disabled" href="/index.php/?view=colors">Colors</a>
+                </li>
 					</div>
 				</li>
 			</ul>
@@ -85,6 +85,13 @@
                 }
                 if ($_GET["view"]=="ads") {
                     require_once("admin/ads.php");
+                }
+
+                if ($_GET["view"]=="menu") {
+                    require_once("admin/menu.php");
+                }
+                if ($_GET["view"]=="colors") {
+                    require_once("admin/colors.php");
                 }
             }
 
